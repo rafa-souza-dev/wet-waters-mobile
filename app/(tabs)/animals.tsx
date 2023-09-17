@@ -5,6 +5,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { ScreenHeader } from "../../components/screen-header";
 import { Animal, AnimalProps } from "../../components/animal";
 import { api } from "../../services/api";
+import { router } from "expo-router";
 
 export default function Animals() {
   const [animals, setAnimals] = useState<AnimalProps[]>([]);
@@ -52,7 +53,7 @@ export default function Animals() {
           alignItems: "center",
           justifyContent: "center",
         }}
-        onPress={() => {}}
+        onPress={() => {router.push("/new/animal")}}
       >
         <AntDesign name="plus" size={32} color="black" />
       </TouchableOpacity>

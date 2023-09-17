@@ -36,6 +36,7 @@ export default function Login() {
     });
     const { token } = response.data;
     await SecureStore.setItemAsync("token", token);
+
     router.push("/(tabs)");
   }
 

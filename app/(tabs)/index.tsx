@@ -102,7 +102,7 @@ export default function ListPosts() {
           alignItems: "center",
           justifyContent: "center",
         }}
-        onPress={() => {}}
+        onPress={() => {router.push("/new/post")}}
       >
         <AntDesign name="plus" size={32} color="black" />
       </TouchableOpacity>
