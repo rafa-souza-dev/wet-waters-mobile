@@ -1,7 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { UserContext } from "../../contexts/user";
+import { WebsocketContext } from "../../contexts/ws";
 
 interface ScreenHeaderProps {
     text: string
@@ -15,7 +16,19 @@ export function ScreenHeader({
     leftIcon,
     text
 }: ScreenHeaderProps) {
-    const { point } = useContext(UserContext)
+    const { point, username, setPoint } = useContext(UserContext)
+    const { lastMessage } = useContext(WebsocketContext)
+
+    useEffect(() => {
+        if (lastMessage) {
+            const data = lastMessage.data
+            const parsedData = JSON.parse(data)
+
+            if (username === parsedData.username && parsedData.type === "update-points") {
+                setPoint(point + Number(parsedData.points))
+            }
+        }
+    }, [lastMessage])
 
     return (
         <View
