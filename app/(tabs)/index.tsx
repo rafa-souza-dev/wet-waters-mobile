@@ -1,19 +1,22 @@
 import { FlatList, TextInput, View, TouchableOpacity } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useContext, useEffect, useState } from "react";
-import { Entypo } from "@expo/vector-icons";
 import React from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { Post, PostProps } from "../../components/post";
 import { ScreenHeader } from "../../components/screen-header";
 import { UserContext } from "../../contexts/user";
 import { api } from "../../services/api";
-import { router } from "expo-router";
 
 export default function ListPosts() {
   const [posts, setPosts] = useState<PostProps[]>([]);
   const [search, setSearch] = useState<string>("");
-  const { setPoint, setUsername, setAvatarUrl } = useContext(UserContext);
+  const {
+    setId,
+    setPoint, 
+    setUsername, 
+    setAvatarUrl
+  } = useContext(UserContext);
   const [token, setToken] = useState<string | null>(null);
 
   async function getProfile() {
@@ -26,9 +29,10 @@ export default function ListPosts() {
       .then(
         (res: {
           data: {
-            user: { username: string; point: number; avatar_url: string };
+            user: { username: string; point: number; avatar_url: string, id: number };
           };
         }) => {
+          setId(res.data.user.id);
           setUsername(res.data.user.username);
           setPoint(res.data.user.point ?? 0);
           setAvatarUrl(res.data.user.avatar_url);
