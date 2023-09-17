@@ -7,6 +7,7 @@ import { Post, PostProps } from "../../components/post";
 import { ScreenHeader } from "../../components/screen-header";
 import { UserContext } from "../../contexts/user";
 import { api } from "../../services/api";
+import { router } from "expo-router"
 
 export default function ListPosts() {
   const [posts, setPosts] = useState<PostProps[]>([]);
