@@ -1,0 +1,10 @@
+type ConservationStatus = 
+    | "EXTINCT" 
+    | "EXTINCT_IN_THE_WILD" 
+    | "CRITICAL_ENDANGERED" 
+    | "ENDANGERED" 
+    | "VULNERABLE" 
+    | "NEAR_THREATENED" 
+    | "LEAST_CONCERN" 
+    | "DATA_DEFICIENT" 
+    | "NOT_AVALUATED"
