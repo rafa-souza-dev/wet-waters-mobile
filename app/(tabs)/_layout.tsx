@@ -1,4 +1,4 @@
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Stack, Tabs } from "expo-router";
 import { UserContextProvider } from "../../contexts/user";
 
@@ -6,10 +6,11 @@ import { UserContextProvider } from "../../contexts/user";
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
  */
 function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>["name"];
+  name: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
   color: string;
+  size: number;
 }) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
+  return <MaterialCommunityIcons style={{ marginBottom: -3 }} {...props} />;
 }
 
 export default function TabLayout() {
@@ -24,21 +25,21 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Posts",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color, size }) => <TabBarIcon name="format-list-bulleted" color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="animals"
         options={{
           title: "Animals",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color, size }) => <TabBarIcon name="jellyfish" color={color} size={size}/>,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: "Perfil",
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          tabBarIcon: ({ color, size }) => <TabBarIcon name="account" color={color} size={size} />,
         }}
       />
     </Tabs>
