@@ -1,10 +1,10 @@
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { AntDesign } from '@expo/vector-icons';
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { api } from "../../services/api";
 import { router } from "expo-router";
-// import { getAuthenticated } from "../../getAuthenticated";
-// import { api } from "../../api";
+import * as SecureStore from "expo-secure-store";
+import { WebsocketContext } from "../../contexts/ws";
 
 export interface PostProps {
   id: number;
@@ -20,17 +20,40 @@ export function Post({ id, description, title, url_image, user, likes, infor }: 
   const [fakeLikes, setFakeLikes] = useState(likes);
   const [isLiked, setIsLiked] = useState(false);
   const [token, setToken ] = useState<string | null>(null);
+  const { sendMessage } = useContext(WebsocketContext)
+
+  async function getToken() {
+    const tokenInfor = await SecureStore.getItemAsync("token");
+    setToken(tokenInfor);
+  }
 
   async function likePost() {
-      await api
-        .post(`v1/posts/${id}/likes`, {}, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        .then((res) => { console.log(res.data) })
-        .catch((err) => console.log(err.response));
+    await api
+      .post(`v1/posts/${id}/likes`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        const { isLiked }: { isLiked: boolean } = res.data
+
+        console.log(res.data)
+
+        sendMessage(JSON.stringify({
+          type: "update-points",
+          username: user,
+          points: isLiked ? -5 : 5
+        }))
+      })
+      .catch((err) => {
+        console.log("falha")
+        console.log(err.response)
+      });
   }
+
+  useEffect(() => {
+    getToken();
+  }, [token]);
 
   return (
     <TouchableOpacity onPress={() => router.push(`/posts/${id}`)}>
@@ -53,6 +76,7 @@ export function Post({ id, description, title, url_image, user, likes, infor }: 
                 size={24} 
                 color="red"
                 onPress={() => {
+                  likePost()
                   setIsLiked(false)
                   setFakeLikes(state => state - 1)
                 }}
@@ -63,6 +87,7 @@ export function Post({ id, description, title, url_image, user, likes, infor }: 
                 size={24} 
                 color="black" 
                 onPress={() => {
+                  likePost()
                   setIsLiked(true)
                   setFakeLikes(state => state + 1)
                 }}
