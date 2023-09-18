@@ -13,6 +13,7 @@ export default function ListPosts() {
   const [posts, setPosts] = useState<PostProps[]>([]);
   const [search, setSearch] = useState<string>("");
   const {
+    id,
     setId,
     setPoint, 
     setUsername, 
@@ -51,7 +52,10 @@ export default function ListPosts() {
           Authorization: `Bearer ${token}`,
         },
       })
-      .then((res) => setPosts(res.data.posts))
+      .then((res) => {
+        console.log(res.data)
+        setPosts(res.data.posts)
+      })
       .catch((err) => {
         console.log(err);
       });
@@ -118,7 +122,18 @@ export default function ListPosts() {
         }}
         data={posts}
         renderItem={({ index, item }) => (
-          <Post key={index} {...item} infor={() => {}} />
+          <Post 
+            key={index} 
+            id={item.id} 
+            description={item.description} 
+            isLiked={!!(item.likes.find(like => like.user_id === id))}
+            likes={item.likes}
+            likes_count={item.likes_count}
+            title={item.title}
+            url_image={item.url_image}
+            user={item.user}
+            infor={() => {}} 
+          />
         )}
       />
       <TextInput

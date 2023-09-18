@@ -12,15 +12,20 @@ export interface PostProps {
   description: string;
   url_image: string;
   user: string;
-  likes: number;
+  likes_count: number;
+  likes: {
+    user_id: number;
+    post_id: number;
+  }[]
+  isLiked: boolean
   infor: (id: number) => void;
 }
 
-export function Post({ id, description, title, url_image, user, likes, infor }: PostProps) {
-  const [fakeLikes, setFakeLikes] = useState(likes);
-  const [isLiked, setIsLiked] = useState(false);
-  const [token, setToken ] = useState<string | null>(null);
+export function Post({ id, description, title, url_image, user, likes_count, isLiked }: PostProps) {
   const { sendMessage } = useContext(WebsocketContext)
+  const [fakeLikes, setFakeLikes] = useState(likes_count);
+  const [isFakeLiked, setIsFakeLiked] = useState(isLiked);
+  const [token, setToken] = useState<string | null>(null);
 
   async function getToken() {
     const tokenInfor = await SecureStore.getItemAsync("token");
@@ -36,8 +41,6 @@ export function Post({ id, description, title, url_image, user, likes, infor }: 
       })
       .then((res) => {
         const { isLiked }: { isLiked: boolean } = res.data
-
-        console.log(res.data)
 
         sendMessage(JSON.stringify({
           type: "update-points",
@@ -70,14 +73,14 @@ export function Post({ id, description, title, url_image, user, likes, infor }: 
           }}
         >
           {
-            isLiked ?
+            isFakeLiked ?
               <AntDesign
                 name="heart" 
                 size={24} 
                 color="red"
                 onPress={() => {
                   likePost()
-                  setIsLiked(false)
+                  setIsFakeLiked(false)
                   setFakeLikes(state => state - 1)
                 }}
               />
@@ -88,7 +91,7 @@ export function Post({ id, description, title, url_image, user, likes, infor }: 
                 color="black" 
                 onPress={() => {
                   likePost()
-                  setIsLiked(true)
+                  setIsFakeLiked(true)
                   setFakeLikes(state => state + 1)
                 }}
               />
