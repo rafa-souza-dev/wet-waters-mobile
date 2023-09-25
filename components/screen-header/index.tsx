@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { UserContext } from "../../contexts/user";
 import { WebsocketContext } from "../../contexts/ws";
@@ -16,8 +16,10 @@ export function ScreenHeader({
     leftIcon,
     text
 }: ScreenHeaderProps) {
-    const { point, username, setPoint } = useContext(UserContext)
+    const { point, username, setPoint, avatar_url } = useContext(UserContext)
     const { lastMessage } = useContext(WebsocketContext)
+
+    console.log("url ", avatar_url)
 
     useEffect(() => {
         if (lastMessage) {
@@ -43,16 +45,26 @@ export function ScreenHeader({
             }}
         >
             {
+                leftIcon ?
                 <TouchableOpacity
                     style={{
                         width: 25,
                         alignItems: "center",
                         justifyContent: "center"
                     }}
-                    onPress={leftIcon?.action}
+                    onPress={leftIcon.action}
                 >
-                    {leftIcon?.icon}
+                    {leftIcon.icon}
                 </TouchableOpacity>
+                :
+                <Image
+                    style={{
+                        width: 30,
+                        height: 30,
+                        borderRadius: 50
+                    }}
+                    source={{ uri: avatar_url }}
+                />
             }
 
             <Text
