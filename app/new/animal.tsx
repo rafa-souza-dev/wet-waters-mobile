@@ -1,4 +1,4 @@
-import { View, Image, TextInput, ScrollView, Text } from "react-native";
+import { View, Image, TextInput, ScrollView, Text, StyleSheet } from "react-native";
 import { useEffect, useState } from "react";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
@@ -9,6 +9,13 @@ import * as SecureStore from "expo-secure-store";
 import { ScreenHeader } from "../../components/screen-header";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { router } from "expo-router";
+import Checkbox from 'expo-checkbox';
+
+type ThreatCause = {
+  id: number
+  description: string
+  isSelected?: boolean
+}
 
 export default function CreateAnimal() {
   const [name, set_name] = useState("");
@@ -17,7 +24,7 @@ export default function CreateAnimal() {
   const [conservation_status, set_conservation_status] =
     useState<ConservationStatus>("NOT_AVALUATED");
   const [ecological_function, set_ecological_function] = useState("");
-  const [threat_causes, set_threat_causes] = useState("Desmatamento, Poluição");
+  const [threat_causes, set_threat_causes] = useState<Array<ThreatCause>>([]);
   const [url_image, set_url_image] = useState<ImagePicker.ImagePickerAsset>();
   const [token, setToken] = useState<string | null>(null);
 
@@ -48,8 +55,8 @@ export default function CreateAnimal() {
           size,
           conservation_status,
           ecological_function,
-          threat_causes,
           image: url_image?.base64!,
+          threat_causes: selectedCausesString
         },
         {
           headers: {
@@ -63,14 +70,48 @@ export default function CreateAnimal() {
       .catch((err) => console.log(err.response.data));
   }
 
-  async function getToken() {
+  async function getTokenAndListThreatCauses() {
     const tokenInfor = await SecureStore.getItemAsync("token");
+
     setToken(tokenInfor);
+
+    await api
+      .get("/v1/threat-causes", {
+        headers: {
+          Authorization: `Bearer ${tokenInfor}`,
+        },
+      })
+      .then((res) => {
+        const data: { threat_causes: ThreatCause[] } = res.data
+        const threat_causes = data.threat_causes
+
+        set_threat_causes(threat_causes.map(cause => {
+          cause.isSelected = false
+
+          return cause
+        }))
+      })
+      .catch((err: any) => console.log(err.response.data));
+  }
+
+  function handleChangeSelectedCause(causeID: number) {
+    set_threat_causes(state => state.map(cause => {
+      if (cause.id === causeID) {
+        cause.isSelected = !cause.isSelected
+      }
+
+      return cause
+    }))
   }
 
   useEffect(() => {
-    getToken();
+    getTokenAndListThreatCauses();
   }, [token]);
+
+  const selectedCausesString = threat_causes
+    .filter(cause => cause.isSelected)
+    .map(cause => cause.description)
+    .join(',')
 
   return (
     <ScrollView>
@@ -144,6 +185,19 @@ export default function CreateAnimal() {
           keyboardType="numeric"
         />
 
+        <View style={styles.container}>
+          {threat_causes.map((threatCause) => (
+            <View key={threatCause.id} style={styles.section}>
+              <Checkbox 
+                style={styles.checkbox}
+                value={threatCause.isSelected} 
+                onValueChange={() => {handleChangeSelectedCause(threatCause.id)}}
+              />
+              <Text style={styles.paragraph}>{threatCause.description}</Text>
+            </View>
+          ))}
+        </View>
+
         <Picker
           style={{ width: 256, backgroundColor: "#fff" }}
           selectedValue={conservation_status}
@@ -159,13 +213,6 @@ export default function CreateAnimal() {
           <Picker.Item label="Dados Deficientes" value={"DATA_DEFICIENT"} />
           <Picker.Item label="Não Avaliado" value={"NOT_AVALUATED"} />
         </Picker>
-
-        {/* <TextInput
-          style={styles.textInput}
-          value={threat_causes}
-          onChangeText={set_threat_causes}
-          placeholder="causas de ameaça"
-        /> */}
 
         <TextInput
           style={{
@@ -197,3 +244,21 @@ export default function CreateAnimal() {
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    marginHorizontal: 5,
+    marginVertical: 10,
+  },
+  section: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  paragraph: {
+    fontSize: 15,
+  },
+  checkbox: {
+    margin: 8,
+  },
+});
