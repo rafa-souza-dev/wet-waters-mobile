@@ -6,10 +6,12 @@ import { ScreenHeader } from "../../components/screen-header";
 import { Animal, AnimalProps } from "../../components/animal";
 import { api } from "../../services/api";
 import { router } from "expo-router";
+import { useIsFocused } from "@react-navigation/native";
 
 export default function Animals() {
   const [animals, setAnimals] = useState<AnimalProps[]>([]);
   const [token, setToken] = useState<string | null>(null);
+  const isFocused = useIsFocused()
 
   async function findAllAnimals() {
     await api
@@ -33,10 +35,10 @@ export default function Animals() {
 
   useEffect(() => {
     getToken();
-    if (!!token) {
+    if (!!token && isFocused) {
       findAllAnimals();
     }
-  }, [token]);
+  }, [token, isFocused]);
 
   return (
     <>
