@@ -1,18 +1,30 @@
-import { Stack, Tabs } from "expo-router";
+import { Stack, Tabs,  } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { WebsocketContextProvider } from "../contexts/ws";
 import { UserContextProvider } from "../contexts/user";
 import { AuthContextProvider } from "../contexts/auth";
+import { useEffect, useState } from "react";
+import { getItemAsync } from "expo-secure-store";
 
 export default function App() {
+
+  const [isUserAuthenticated, setIsUserAuthenticate] = useState<boolean>(false);
+
+  useEffect(() => {
+    getItemAsync('token').then(token => {
+        setIsUserAuthenticate(!!token);
+    })
+  }, []);
+
   return (
     <AuthContextProvider>
       <WebsocketContextProvider>
         <UserContextProvider>
           <StatusBar style="inverted" hidden />
-          <Stack
+          <Tabs
             screenOptions={{
               headerShown: false,
+              tabBarStyle: {display: "none"}
             }}
           >
             <Stack.Screen
@@ -20,6 +32,7 @@ export default function App() {
               options={{
                 title: "Home",
               }}
+              redirect={isUserAuthenticated}
             />
             <Tabs.Screen
               name="(tabs)"
@@ -27,7 +40,7 @@ export default function App() {
                 title: "Blog",
               }}
             />
-          </Stack>
+          </Tabs>
         </UserContextProvider>
       </WebsocketContextProvider>
     </AuthContextProvider>

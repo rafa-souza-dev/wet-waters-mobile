@@ -12,14 +12,14 @@ export default function Profile() {
         setToken(null)
         await deleteItemAsync("token");
 
-        router.push('/')
+        router.push('/sign-in')
     }
 
     return (
         <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
             <Text>Profile</Text>
             <TouchableOpacity onPress={handleLogout}>
-                Sair do Software
+                <Text>Sair do Software</Text>
             </TouchableOpacity>
         </View>
     )
