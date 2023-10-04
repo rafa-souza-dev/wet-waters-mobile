@@ -1,15 +1,14 @@
 import {
-  AuthRequestPromptOptions,
-  AuthSessionResult,
   makeRedirectUri,
   useAuthRequest,
 } from "expo-auth-session";
 import { View, TouchableOpacity, Text } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import { Link, router } from "expo-router";
-import { useEffect } from "react";
+import { router } from "expo-router";
+import { useContext, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import { api } from "../services/api";
+import { AuthContext } from "../contexts/auth";
 
 const discovery = {
   authorizationEndpoint: "https://github.com/login/oauth/authorize",
@@ -30,15 +29,24 @@ export default function Login() {
     discovery
   );
 
+  const { token, setToken } = useContext(AuthContext)
+
   async function handleGithubOAuthCode(code: string) {
     const response = await api.post("auth/register", {
       code,
     });
     const { token } = response.data;
+
+    setToken(token)
+
     await SecureStore.setItemAsync("token", token);
 
     router.push("/(tabs)");
   }
+
+  useEffect(() => {
+    if (token) router.push("/(tabs)")
+  }, [])
 
   useEffect(() => {
     if (response?.type === "success") {
