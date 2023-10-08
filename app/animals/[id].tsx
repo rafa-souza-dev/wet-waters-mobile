@@ -69,7 +69,7 @@ export default function AnimalInfor() {
         leftIcon={{
           icon: <AntDesign name="arrowleft" size={30} color="black" />,
           action: () => {
-            router.push("/animals");
+            router.push("/");
           },
         }}
       />

@@ -6,13 +6,12 @@ import { deleteItemAsync } from "expo-secure-store";
 import { router } from 'expo-router';
 
 export default function Profile() {
-    const { setToken } = useContext(AuthContext)
+    const { setUser } = useContext(AuthContext)
 
     async function handleLogout() {
-        setToken(null)
         await deleteItemAsync("token");
+        setUser(null);
 
-        router.push('/sign-in')
     }
 
     return (
