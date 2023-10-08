@@ -2,16 +2,18 @@ import { FlatList, TextInput, View, TouchableOpacity } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useContext, useEffect, useState } from "react";
 import React from "react";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { Post, PostProps } from "../../components/post";
 import { ScreenHeader } from "../../components/screen-header";
 import { UserContext } from "../../contexts/user";
 import { api } from "../../services/api";
 import { router } from "expo-router"
+import { AuthContext } from "../../contexts/auth";
 
 export default function ListPosts() {
   const [posts, setPosts] = useState<PostProps[]>([]);
   const [search, setSearch] = useState<string>("");
+  const { user } = useContext(AuthContext);
   const {
     id,
     setId,
@@ -113,8 +115,27 @@ export default function ListPosts() {
         }}
         onPress={() => {router.push("/new/post")}}
       >
-        <AntDesign name="plus" size={32} color="black" />
+      <AntDesign name="plus" size={32} color="black" />
       </TouchableOpacity>
+      { user?.role === "ADMIN" &&
+      <TouchableOpacity
+        style={{
+          position: "absolute",
+          left: "80%",
+          bottom: "18%",
+          backgroundColor: "red",
+          zIndex: 1000,
+          borderRadius: 50,
+          width: 50,
+          height: 50,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+        onPress={() => {router.push("/(admin)/posts-analysis")}}
+      >
+        <Ionicons name="analytics" size={32} color="black" />
+      </TouchableOpacity>
+      }
       <FlatList
         style={{
           backgroundColor: "#0984E3",

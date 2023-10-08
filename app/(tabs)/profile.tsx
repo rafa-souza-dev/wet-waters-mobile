@@ -3,7 +3,6 @@ import{ View, Text } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { AuthContext } from '../../contexts/auth';
 import { deleteItemAsync } from "expo-secure-store";
-import { router } from 'expo-router';
 
 export default function Profile() {
     const { setUser } = useContext(AuthContext)

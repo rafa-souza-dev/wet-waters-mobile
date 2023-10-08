@@ -2,9 +2,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import { PrivateRoute } from "../../components/private-route/PrivateRoute";
 
-/**
- * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
- */
+
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
   color: string;
