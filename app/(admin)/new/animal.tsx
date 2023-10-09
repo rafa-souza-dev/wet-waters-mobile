@@ -2,11 +2,11 @@ import { View, Image, TextInput, ScrollView, Text, StyleSheet } from "react-nati
 import { useEffect, useState } from "react";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
-import { api } from "../../services/api";
+import { api } from "../../../services/api";
 import { AntDesign } from "@expo/vector-icons";
 import React from "react";
 import * as SecureStore from "expo-secure-store";
-import { ScreenHeader } from "../../components/screen-header";
+import { ScreenHeader } from "../../../components/screen-header";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { router } from "expo-router";
 import Checkbox from 'expo-checkbox';

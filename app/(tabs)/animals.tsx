@@ -1,23 +1,24 @@
 import { FlatList, TouchableOpacity } from "react-native";
 import * as SecureStore from "expo-secure-store";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { ScreenHeader } from "../../components/screen-header";
 import { Animal, AnimalProps } from "../../components/animal";
 import { api } from "../../services/api";
 import { router } from "expo-router";
 import { useIsFocused } from "@react-navigation/native";
+import { AuthContext } from "../../contexts/auth";
 
 export default function Animals() {
+  const { user } = useContext(AuthContext);
   const [animals, setAnimals] = useState<AnimalProps[]>([]);
-  const [token, setToken] = useState<string | null>(null);
-  const isFocused = useIsFocused()
+  const isFocused = useIsFocused();
 
   async function findAllAnimals() {
     await api
       .get("v1/animals", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${user?.token}`,
         },
       })
       .then((res: { data: { animals: AnimalProps[] } }) => {
@@ -28,37 +29,35 @@ export default function Animals() {
       });
   }
 
-  async function getToken() {
-    const tokenInfor = await SecureStore.getItemAsync("token");
-    setToken(tokenInfor);
-  }
-
   useEffect(() => {
-    getToken();
-    if (!!token && isFocused) {
+    if (user && isFocused) {
       findAllAnimals();
     }
-  }, [token, isFocused]);
+  }, [isFocused]);
 
   return (
     <>
-      <TouchableOpacity
-        style={{
-          position: "absolute",
-          left: "80%",
-          bottom: "10%",
-          backgroundColor: "red",
-          zIndex: 1000,
-          borderRadius: 50,
-          width: 50,
-          height: 50,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-        onPress={() => {router.push("/new/animal")}}
-      >
-        <AntDesign name="plus" size={32} color="black" />
-      </TouchableOpacity>
+      {user?.role === "ADMIN" && (
+        <TouchableOpacity
+          style={{
+            position: "absolute",
+            left: "80%",
+            bottom: "10%",
+            backgroundColor: "red",
+            zIndex: 1000,
+            borderRadius: 50,
+            width: 50,
+            height: 50,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          onPress={() => {
+            router.push("/new/animal");
+          }}
+        >
+          <AntDesign name="plus" size={32} color="black" />
+        </TouchableOpacity>
+      )}
       <ScreenHeader text="Catálogo de Animais" />
       <FlatList
         style={{
