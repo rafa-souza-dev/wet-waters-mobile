@@ -19,6 +19,7 @@ export interface PostProps {
   }[]
   isLiked: boolean
   infor: (id: number) => void;
+  published_at: string | null
 }
 
 export function Post({ id, description, title, url_image, user, likes_count, isLiked }: PostProps) {

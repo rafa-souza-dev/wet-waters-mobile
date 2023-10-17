@@ -1,19 +1,74 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import { Image, ScrollView, Text, View } from "react-native";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { api } from "../../services/api";
 import { ScreenHeader } from "../../components/screen-header";
-import { router, useGlobalSearchParams, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
+import RadioGroup from 'react-native-radio-buttons-group';
 
 export default function PostInfor() {
   const { id } = useLocalSearchParams();
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [url_image, setUrl_image] = useState<string>();
+  const [published_at, setPublishedAt] = useState<Date | null>();
   const [user, setUser] = useState<string>("");
   const [likes, setLikes] = useState<number>(0);
   const [token, setToken] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState('1');
+
+  function renderValidateOptions() {
+    const options = [
+      {
+        id: '1',
+        label: '100',
+        value: '100'
+      },
+      {
+        id: '2',
+        label: '150',
+        value: '150'
+      },
+      {
+        id: '3',
+        label: '200',
+        value: '200'
+      },
+    ]
+
+    return (
+      <View style={{
+        flexDirection: 'column',
+        gap: 8
+      }}>
+        <Text>Points</Text>
+        <RadioGroup
+          radioButtons={options}
+          onPress={setSelectedId}
+          selectedId={selectedId}
+        />
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            backgroundColor: 'green',
+            height: 40
+          }}
+        >
+          Aprovar
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            backgroundColor: 'red',
+            height: 40
+          }}
+        >
+          Reprovar
+        </TouchableOpacity>
+      </View>
+    )
+  }
 
   async function getPost() {
     await api
@@ -24,6 +79,7 @@ export default function PostInfor() {
       })
       .then((response) => {
         setTitle(response.data.post.title);
+        setPublishedAt(published_at ? new Date(response.data.post.published_at) : null);
         setDescription(response.data.post.description);
         setUrl_image(response.data.post.url_image);
         setUser(response.data.post.user);
@@ -82,6 +138,10 @@ export default function PostInfor() {
         <Text style={{ fontSize: 16, textAlign: "justify" }}>
           {description}
         </Text>
+        {
+          published_at === null &&
+          renderValidateOptions()
+        }
       </View>
     </ScrollView>
   );
