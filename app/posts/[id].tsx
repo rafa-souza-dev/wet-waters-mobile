@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { api } from "../../services/api";
 import { ScreenHeader } from "../../components/screen-header";
 import { router, useLocalSearchParams } from "expo-router";
 import RadioGroup from 'react-native-radio-buttons-group';
 
-export default function PostInfor() {
+export default function PostInfor(props: any) {
   const { id } = useLocalSearchParams();
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -17,6 +17,28 @@ export default function PostInfor() {
   const [likes, setLikes] = useState<number>(0);
   const [token, setToken] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState('1');
+
+  async function handleValidatePost(options: {
+    id: string,
+    label: string,
+    value: string
+  }[], is_valid: boolean) {
+    await api
+      .post(`/v1/posts/${id}/validate`, {
+        is_valid,
+        points: Number(options.find(option => option.id === selectedId)!.value),
+        post_id: Number(id)
+      },
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        router.push('/')
+      })
+      .catch(err => { Alert.alert(err) })
+  }
 
   function renderValidateOptions() {
     const options = [
@@ -54,6 +76,7 @@ export default function PostInfor() {
             backgroundColor: 'green',
             height: 40
           }}
+          onPress={() => {handleValidatePost(options, true)}}
         >
           Aprovar
         </TouchableOpacity>
@@ -63,6 +86,7 @@ export default function PostInfor() {
             backgroundColor: 'red',
             height: 40
           }}
+          onPress={() => {handleValidatePost(options, false)}}
         >
           Reprovar
         </TouchableOpacity>
